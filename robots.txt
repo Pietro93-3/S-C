@@ -1,0 +1,4 @@
+# Powerbuilding — app personale
+# Richiediamo ai motori di ricerca di non indicizzare questo sito.
+User-agent: *
+Disallow: /
