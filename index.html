@@ -19,7 +19,10 @@
       // Registrazione service worker (sw.js in public/): la versione cache va
       // incrementata in sw.js a ogni release, altrimenti i client restano sui
       // bundle vecchi (nomi file fissi + cache-first).
-      if ("serviceWorker" in navigator) {
+      // Solo in produzione: in dev (localhost) il caching cache-first del SW
+      // congelerebbe i moduli di Vite alla prima versione caricata.
+      const isDev = ["localhost", "127.0.0.1"].includes(location.hostname);
+      if ("serviceWorker" in navigator && !isDev) {
         window.addEventListener("load", () => {
           navigator.serviceWorker.register("./sw.js").catch(() => {});
         });
