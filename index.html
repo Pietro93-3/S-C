@@ -10,10 +10,20 @@
     <title>S&C</title>
     <link rel="manifest" href="./manifest.json" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
-    <script type="module" crossorigin src="./assets/index.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index.css">
+    <script type="module" crossorigin src="/assets/index.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index.css">
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Registrazione service worker (sw.js in public/): la versione cache va
+      // incrementata in sw.js a ogni release, altrimenti i client restano sui
+      // bundle vecchi (nomi file fissi + cache-first).
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("./sw.js").catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>
