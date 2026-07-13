@@ -26,6 +26,25 @@
         window.addEventListener("load", () => {
           navigator.serviceWorker.register("./sw.js").catch(() => {});
         });
+        navigator.serviceWorker.addEventListener("message", (event) => {
+          if (event.data && event.data.type === "SW_UPDATED") {
+            if (document.getElementById("sc-update-banner")) return;
+            var banner = document.createElement("div");
+            banner.id = "sc-update-banner";
+            banner.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;background:#1a1a1e;border-bottom:2px solid #CFEF32;padding:16px 18px;font-family:system-ui,sans-serif;color:#eee;font-size:14px;line-height:1.5;box-shadow:0 4px 20px rgba(0,0,0,0.6);";
+            banner.innerHTML = '<div style="font-weight:800;color:#CFEF32;margin-bottom:6px;font-size:15px">Aggiornamento disponibile</div>'
+              + '<div style="color:#bbb;font-size:13px;margin-bottom:12px">È stata pubblicata una nuova versione dell\'app.<br>'
+              + 'Prima di aggiornare, ti consigliamo di:<br>'
+              + '• <b>Salvare un backup</b> (Menu → Backup e ripristino)<br>'
+              + '• <b>Svuotare i dati memorizzati</b> del sito dal browser<br>'
+              + '(non serve disinstallare l\'app)</div>'
+              + '<div style="display:flex;gap:8px">'
+              + '<button onclick="location.reload()" style="flex:1;background:#CFEF32;color:#1a1a00;border:none;border-radius:8px;padding:10px 0;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit">Aggiorna ora</button>'
+              + '<button onclick="this.parentNode.parentNode.remove()" style="background:transparent;color:#aaa;border:1px solid #3A3A40;border-radius:8px;padding:10px 14px;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit">Dopo</button>'
+              + '</div>';
+            document.body.appendChild(banner);
+          }
+        });
       }
     </script>
   </body>
