@@ -18,13 +18,29 @@
     <script>
       // Registrazione service worker (sw.js in public/): la versione cache va
       // incrementata in sw.js a ogni release, altrimenti i client restano sui
-      // bundle vecchi (nomi file fissi + cache-first).
+      // bundle vecchi. I bundle hanno nomi fissi (assets/index.js), quindi il SW
+      // li serve network-first: senza hash nel nome, cache-first mostrerebbe per
+      // sempre la versione vecchia allo stesso URL.
       // Solo in produzione: in dev (localhost) il caching cache-first del SW
       // congelerebbe i moduli di Vite alla prima versione caricata.
       const isDev = ["localhost", "127.0.0.1"].includes(location.hostname);
       if ("serviceWorker" in navigator && !isDev) {
         window.addEventListener("load", () => {
-          navigator.serviceWorker.register("./sw.js").catch(() => {});
+          navigator.serviceWorker.register("./sw.js").then((reg) => {
+            // Riaprendo l'app installata la navigazione non riparte, quindi il
+            // browser potrebbe non ricontrollare sw.js per un pezzo: lo chiediamo
+            // noi ogni volta che l'app torna in primo piano.
+            var ultimoCheck = 0;
+            var controlla = function () {
+              if (document.visibilityState !== "visible") return;
+              var ora = Date.now();
+              if (ora - ultimoCheck < 60000) return;   // non più di una volta al minuto
+              ultimoCheck = ora;
+              reg.update().catch(function () {});
+            };
+            document.addEventListener("visibilitychange", controlla);
+            controlla();
+          }).catch(() => {});
         });
         navigator.serviceWorker.addEventListener("message", (event) => {
           if (event.data && event.data.type === "SW_UPDATED") {
@@ -34,10 +50,7 @@
             banner.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;background:#1a1a1e;border-bottom:2px solid #CFEF32;padding:16px 18px;font-family:system-ui,sans-serif;color:#eee;font-size:14px;line-height:1.5;box-shadow:0 4px 20px rgba(0,0,0,0.6);";
             banner.innerHTML = '<div style="font-weight:800;color:#CFEF32;margin-bottom:6px;font-size:15px">Aggiornamento disponibile</div>'
               + '<div style="color:#bbb;font-size:13px;margin-bottom:12px">È stata pubblicata una nuova versione dell\'app.<br>'
-              + 'Prima di aggiornare, ti consigliamo di:<br>'
-              + '• <b>Salvare un backup</b> (Menu → Backup e ripristino)<br>'
-              + '• <b>Svuotare i dati memorizzati</b> del sito dal browser<br>'
-              + '(non serve disinstallare l\'app)</div>'
+              + 'Tocca <b>Aggiorna ora</b>: i tuoi dati restano dove sono.</div>'
               + '<div style="display:flex;gap:8px">'
               + '<button onclick="location.reload()" style="flex:1;background:#CFEF32;color:#1a1a00;border:none;border-radius:8px;padding:10px 0;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit">Aggiorna ora</button>'
               + '<button onclick="this.parentNode.parentNode.remove()" style="background:transparent;color:#aaa;border:1px solid #3A3A40;border-radius:8px;padding:10px 14px;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit">Dopo</button>'
