@@ -11,7 +11,7 @@
 // IMPORTANTE: CACHE_VERSION va incrementata a ogni release del progetto. È l'unico modo per far sì
 // che il browser scarichi il nuovo sw.js (lo confronta byte per byte con quello già installato: se
 // il file è identico, anche con codice diverso altrove, NON lo considera un aggiornamento).
-const CACHE_VERSION = "v50";
+const CACHE_VERSION = "v51";
 const CACHE_NAME = `powerbuilding-cache-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
